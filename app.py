@@ -51,7 +51,7 @@ def listar_usuarios():
             u.ApellidoPaterno,
             u.ApellidoMaterno,
             u.Genero,
-            u.PlanAlimenticio_codigo,
+            u.PlanAlimenticio_Codigo,
             u.Estatura,
             u.Peso,
             u.IMC,
@@ -60,8 +60,8 @@ def listar_usuarios():
             p.Carbohidrato,
             p.Grasa
         FROM users u
-        INNER JOIN planalimenticio p
-        ON u.PlanAlimenticio_codigo = p.Codigo"""
+        INNER JOIN planAlimenticio p
+        ON u.PlanAlimenticio_Codigo = p.Codigo"""
         cursor.execute(sql)
         datos = cursor.fetchall()
 
@@ -73,7 +73,7 @@ def listar_usuarios():
                 'ApellidoPaterno': fila[2],
                 'ApellidoMaterno': fila[3],
                 'Genero': fila[4],
-                'PlanAlimenticio_codigo': fila[5],
+                'PlanAlimenticio_Codigo': fila[5],
                 'Estatura': fila[6],
                 'Peso': fila[7],
                 'IMC': fila[8],
@@ -105,8 +105,8 @@ def calcular_consumo():
         
         # Obtener el plan alimenticio del usuario
         sql = """SELECT Proteina, Carbohidrato, Grasa 
-                 FROM planalimenticio 
-                 WHERE Codigo = (SELECT id_plan FROM usuario WHERE id = %s)"""
+                 FROM planAlimenticio 
+                 WHERE Codigo = (SELECT PlanAlimenticio_codigo FROM usuario WHERE matricula = %s)"""
         cursor.execute(sql, (matricula,))
         plan = cursor.fetchone()
 
