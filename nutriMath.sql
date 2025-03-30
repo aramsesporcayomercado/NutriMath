@@ -40,7 +40,7 @@ CREATE TABLE `consumo_energetico` (
 -- Estructura de tabla para la tabla `planalimenticio`
 --
 
-CREATE TABLE `planalimenticio` (
+CREATE TABLE `planAlimenticio` (
   `Codigo` int(11) NOT NULL,
   `Proteina` float DEFAULT NULL,
   `Carbohidrato` float DEFAULT NULL,
@@ -59,7 +59,7 @@ CREATE TABLE `users` (
   `ApellidoPaterno` varchar(50) DEFAULT NULL,
   `ApellidoMaterno` varchar(50) DEFAULT NULL,
   `Genero` varchar(10) DEFAULT NULL,
-  `PlanAlimenticio_codigo` int(11) DEFAULT NULL,
+  `PlanAlimenticio_Codigo` int(11) DEFAULT NULL,
   `Estatura` float DEFAULT NULL,
   `Peso` float DEFAULT NULL,
   `IMC` float DEFAULT NULL
@@ -79,7 +79,7 @@ ALTER TABLE `consumo_energetico`
 --
 -- Indices de la tabla `planalimenticio`
 --
-ALTER TABLE `planalimenticio`
+ALTER TABLE `planAlimenticio`
   ADD PRIMARY KEY (`Codigo`);
 
 --
@@ -87,7 +87,7 @@ ALTER TABLE `planalimenticio`
 --
 ALTER TABLE `users`
   ADD PRIMARY KEY (`Matricula`),
-  ADD KEY `PlanAlimenticio_codigo` (`PlanAlimenticio_codigo`);
+  ADD KEY `PlanAlimenticio_Codigo` (`PlanAlimenticio_Codigo`);
 
 --
 -- AUTO_INCREMENT de las tablas volcadas
@@ -113,7 +113,7 @@ ALTER TABLE `consumo_energetico`
 -- Filtros para la tabla `users`
 --
 ALTER TABLE `users`
-  ADD CONSTRAINT `users_ibfk_1` FOREIGN KEY (`PlanAlimenticio_codigo`) REFERENCES `planalimenticio` (`Codigo`);
+  ADD CONSTRAINT `users_ibfk_1` FOREIGN KEY (`PlanAlimenticio_Codigo`) REFERENCES `planalimenticio` (`Codigo`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
