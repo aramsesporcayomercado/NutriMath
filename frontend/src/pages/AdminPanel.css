@@ -1,13 +1,10 @@
-/* Estilos generales */
 .admin-panel {
     display: grid;
     grid-template-columns: 1fr;
     gap: 20px;
     padding: 20px;
-    font-family: Arial, sans-serif;
 }
 
-/* Información del usuario */
 .user-info {
     background-color: #ffffff;
     border-radius: 12px;
@@ -15,16 +12,6 @@
     padding: 20px;
 }
 
-.user-info h2 {
-    font-size: 18px;
-    font-weight: bold;
-}
-
-.user-info p {
-    margin-top: 8px;
-}
-
-/* Botones de selección de mes */
 .month-buttons {
     display: flex;
     justify-content: center;
@@ -32,34 +19,22 @@
 }
 
 .month-button {
-    padding: 10px 20px;
-    border-radius: 8px;
-    border: none;
+    padding: 12px;
+    border-radius: 10px;
     background-color: #1DE022;
-    /* Verde claro */
     color: white;
-    cursor: pointer;
+    border-color: #ffffff;
 }
 
 .month-button.active {
     background-color: #16B017;
-    /* Verde más fuerte */
 }
 
-.month-button:hover {
-    background-color: #16B017;
-    /* Verde más fuerte al pasar el mouse */
-}
-
-/* Gráficas */
 .charts {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 20px;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
 }
 
 .chart-container {
     background-color: #ffffff;
-    border-radius: 12px;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, .1);
 }
