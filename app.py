@@ -29,10 +29,10 @@ def apply_cors(response):
 
 
 # Configuración de la base de datos
-app.config['MYSQL_HOST'] = os.getenv('MYSQL_HOST')
-app.config['MYSQL_USER'] = os.getenv('MYSQL_USER')
-app.config['MYSQL_PASSWORD'] = os.getenv('MYSQL_PASSWORD')
-app.config['MYSQL_DB'] = os.getenv('MYSQL_DB')
+app.config['MYSQL_HOST'] = MYSQL_HOST
+app.config['MYSQL_USER'] = MYSQL_USER
+app.config['MYSQL_PASSWORD'] = MYSQL_PASSWORD
+app.config['MYSQL_DB'] = MYSQL_DB
 mysql = MySQL(app)
 
 
@@ -94,48 +94,92 @@ def listar_usuarios():
         return jsonify({'mensaje': f"Error al listar usuarios: {str(ex)}"}), 500
 
 
-@app.route('/consumo_energetico', methods=['POST'])
-@cross_origin()
+# Ruta para calcular consumo energético
+@app.route('/consumo_energetico', methods=['POST', 'GET'])
 def calcular_consumo():
-    try:
-        data = request.json
-        matricula = data.get("matricula")
+    if request.method == 'POST':
+        try:
+            data = request.json
+            matricula = data.get("matricula")
 
-        cursor = mysql.connection.cursor()
-        
-        # Obtener el plan alimenticio del usuario
-        sql = """SELECT Proteina, Carbohidrato, Grasa 
-                 FROM planAlimenticio 
-                 WHERE Codigo = (SELECT PlanAlimenticio_codigo FROM usuario WHERE matricula = %s)"""
-        cursor.execute(sql, (matricula,))
-        plan = cursor.fetchone()
+            if not matricula:
+                return jsonify({"mensaje": "La matrícula es requerida"}), 400
 
-        if not plan:
-            return jsonify({"mensaje": "El usuario no tiene un plan asignado"}), 404
+            # Código para manejar POST
+            cursor = mysql.connection.cursor()
 
-        P, C, G = plan  # Proteína, Carbohidrato y Grasa
+            # Obtener el plan alimenticio del usuario
+            sql = """SELECT Proteina, Carbohidrato, Grasa 
+                     FROM planAlimenticio 
+                     WHERE Codigo = (SELECT PlanAlimenticio_codigo FROM users WHERE matricula = %s)"""
+            cursor.execute(sql, (matricula,))
+            plan = cursor.fetchone()
 
-        # Calcular el consumo energético con derivadas parciales
-        E = (4 * P) + (4 * C) + (9 * G)
-        dE_dP, dE_dC, dE_dG = 4, 4, 9
+            if not plan:
+                return jsonify({"mensaje": "El usuario no tiene un plan asignado"}), 404
 
-        # Guardar el consumo energético en la base de datos con el mes actual
-        mes_actual = datetime.datetime.now().strftime("%Y-%m")
-        sql_insert = """INSERT INTO consumo_energetico (matricula, mes, consumo) 
-                        VALUES (%s, %s, %s)"""
-        cursor.execute(sql_insert, (matricula, mes_actual, E))
-        mysql.connection.commit()
-        cursor.close()
+            P, C, G = plan  # Proteína, Carbohidrato y Grasa
 
-        return jsonify({
-            "matricula": matricula,
-            "nutrientes": {"Proteina": P, "Carbohidrato": C, "Grasa": G},
-            "derivadas_parciales": {"dE_dP": dE_dP, "dE_dC": dE_dC, "dE_dG": dE_dG},
-            "energia_total": E
-        }), 200
+            # Calcular el consumo energético con derivadas parciales
+            E = (4 * P) + (4 * C) + (9 * G)
+            dE_dP, dE_dC, dE_dG = 4, 4, 9
 
-    except Exception as ex:
-        return jsonify({"mensaje": f"Error al calcular consumo energético: {str(ex)}"}), 500
+            # Guardar el consumo energético en la base de datos con el mes actual
+            mes_actual = datetime.datetime.now().strftime("%Y-%m")
+            sql_insert = """INSERT INTO consumo_energetico (matricula, mes, consumo) 
+                            VALUES (%s, %s, %s)"""
+            cursor.execute(sql_insert, (matricula, mes_actual, E))
+            mysql.connection.commit()
+            cursor.close()
+
+            return jsonify({
+                "matricula": matricula,
+                "nutrientes": {"Proteina": P, "Carbohidrato": C, "Grasa": G},
+                "derivadas_parciales": {"dE_dP": dE_dP, "dE_dC": dE_dC, "dE_dG": dE_dG},
+                "energia_total": E
+            }), 200
+
+        except Exception as ex:
+            return jsonify({"mensaje": f"Error al calcular consumo energético: {str(ex)}"}), 500
+
+    elif request.method == 'GET':
+        try:
+            # Obtener datos desde la base de datos
+            cursor = mysql.connection.cursor()
+
+            # Obtener el plan alimenticio del usuario
+            sql = """SELECT Proteina, Carbohidrato, Grasa 
+                     FROM planAlimenticio 
+                     WHERE Codigo = (SELECT PlanAlimenticio_codigo FROM users WHERE matricula = 1)"""
+            cursor.execute(sql)
+            plan = cursor.fetchone()
+
+            if not plan:
+                return jsonify({"mensaje": "El usuario no tiene un plan asignado"}), 404
+
+            P, C, G = plan  # Proteína, Carbohidrato y Grasa
+
+            # Calcular el consumo energético con derivadas parciales
+            E = (4 * P) + (4 * C) + (9 * G)
+            dE_dP, dE_dC, dE_dG = 4, 4, 9
+
+            # Guardar el consumo energético en la base de datos con el mes actual
+            mes_actual = datetime.datetime.now().strftime("%Y-%m")
+            sql_insert = """INSERT INTO consumo_energetico (matricula, mes, consumo) 
+                            VALUES (%s, %s, %s)"""
+            cursor.execute(sql_insert, ('A001', mes_actual, E))
+            mysql.connection.commit()
+            cursor.close()
+
+            return jsonify({
+                "matricula": 'A001',
+                "nutrientes": {"Proteina": P, "Carbohidrato": C, "Grasa": G},
+                "derivadas_parciales": {"dE_dP": dE_dP, "dE_dC": dE_dC, "dE_dG": dE_dG},
+                "energia_total": E
+            }), 200
+
+        except Exception as ex:
+            return jsonify({"mensaje": f"Error al calcular consumo energético: {str(ex)}"}), 500
 
 
 @app.route('/tasa_cambio/<int:matricula>', methods=['GET'])
