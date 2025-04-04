@@ -32,9 +32,9 @@ const AdminPanel = () => {
         <h2>Información del Usuario</h2>
         {userInfo && (
           <div>
-            <p><strong>Nombre:</strong> {userInfo.nombre}</p>
+            <p><strong>Nombre:</strong> {userInfo.Nombre}</p>
             <p><strong>Edad:</strong> {userInfo.edad}</p>
-            <p><strong>Peso:</strong> {userInfo.peso} kg</p>
+            <p><strong>Peso:</strong> {userInfo.Peso} kg</p>
           </div>
         )}
       </div>
@@ -53,46 +53,65 @@ const AdminPanel = () => {
       </div>
 
       {/* Gráficas */}
-      <div className="charts">
-        <div className="chart-container">
-          <h2>Consumo Energético</h2>
-          {energyData && (
-            <Bar
-              data={{
-                labels: ["Proteína", "Carbohidrato", "Grasa"],
-                datasets: [
-                  {
-                    label: "Consumo Energético",
-                    data: [energyData.Proteina, energyData.Carbohidrato, energyData.Grasa],
-                    backgroundColor: ["#FF6384", "#36A2EB", "#FFCE56"],
-                  },
-                ],
-              }}
-            />
-          )}
-        </div>
+      <Charts energyData={energyData} changeRateData={changeRateData} />
+    </div>
+  );
+};
 
-        <div className="chart-container">
-          <h2>Tasa de Cambio</h2>
-          {changeRateData && (
-            <Line
-              data={{
-                labels: ["Mes Anterior", "Mes Actual"],
-                datasets: [
-                  {
-                    label: "Tasa de Cambio (%)",
-                    data: [changeRateData.consumo_anterior, changeRateData.consumo_actual],
-                    borderColor: "#4BC0C0",
-                    fill: false,
-                  },
-                ],
-              }}
-            />
-          )}
-        </div>
+// Componente Charts
+const Charts = ({ energyData = {}, changeRateData = {} }) => {
+  return (
+    <div className="charts">
+      {/* Gráfica de Consumo Energético */}
+      <div className="chart-container">
+        <h2>Consumo Energético</h2>
+        {energyData && (
+          <Bar
+            data={{
+              labels: ["Proteína", "Carbohidrato", "Grasa"],
+              datasets: [
+                {
+                  label: "Consumo Energético",
+                  data: [
+                    energyData.Proteina || 0,
+                    energyData.Carbohidrato || 0,
+                    energyData.Grasa || 0,
+                  ],
+                  backgroundColor: ["#FF6384", "#36A2EB", "#FFCE56"],
+                },
+              ],
+            }}
+            options={{ responsive: true }}
+          />
+        )}
+      </div>
+
+      {/* Gráfica de Tasa de Cambio */}
+      <div className="chart-container">
+        <h2>Tasa de Cambio</h2>
+        {changeRateData && (
+          <Line
+            data={{
+              labels: ["Mes Anterior", "Mes Actual"],
+              datasets: [
+                {
+                  label: "Tasa de Cambio (%)",
+                  data: [
+                    changeRateData.consumo_anterior || 0,
+                    changeRateData.consumo_actual || 0,
+                  ],
+                  borderColor: "#4BC0C0",
+                  fill: false,
+                },
+              ],
+            }}
+            options={{ responsive: true }}
+          />
+        )}
       </div>
     </div>
   );
 };
 
 export default AdminPanel;
+
